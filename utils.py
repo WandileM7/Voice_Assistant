@@ -15,6 +15,13 @@ api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
 def speak(text, rate=120):
+    """
+    Convert text to speech using OpenAI's text-to-speech API and play it.
+
+    Args:
+        text (str): The text to be spoken.
+        rate (int, optional): The speech rate. Defaults to 120.
+    """
     time.sleep(0.3)
     try:
         response = client.audio.speech.create(

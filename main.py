@@ -1,16 +1,9 @@
 import datetime
-# import math
-# from pathlib import Path
-# import sys
 import time
-# import threading
 import webbrowser
 from dotenv import load_dotenv
 from openai import OpenAI
-# import pygame
-# import pyttsx3
 import speech_recognition as sr
-# import pyautogui
 import os.path
 import json
 from events import *
@@ -45,30 +38,13 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     scope="user-read-playback-state,user-modify-playback-state"
 ))
 
-# def speak(text, rate=120):
-#     time.sleep(0.3)
-#     try:
-#         response = client.audio.speech.create(
-#             model="tts-1",
-#             voice="nova",
-#             input=text
-#         )
-#         speech_file_path = Path(__file__).parent / "speech.mp3"
-#         response.stream_to_file(speech_file_path)
-#         pygame.mixer.init(frequency=12000, buffer=512)
-#         speech_sound = pygame.mixer.Sound(speech_file_path)
-#         speech_length = int(math.ceil(pygame.mixer.Sound.get_length(speech_sound)))
-#         speech_sound.play()
-#         time.sleep(speech_length)
-#         pygame.mixer.quit()
-#     except Exception as e:
-#         print(f"An error occurred during speech synthesis: {e}")
-#     finally:
-#         # Clean up the temporary speech file
-#         if os.path.exists(speech_file_path):
-#             os.remove(speech_file_path)
-
 def command():
+    """
+    Listen for and recognize voice commands using speech recognition.
+
+    Returns:
+        str: The recognized voice command as text.
+    """
     r = sr.Recognizer()
     with sr.Microphone() as source:
         print("Listening...")
@@ -98,6 +74,12 @@ def command():
             return ""
 
 def cal_day():
+    """
+    Calculate the current day of the week.
+
+    Returns:
+        str: The name of the current day (e.g., "Monday", "Tuesday", etc.).
+    """
     day = datetime.datetime.today().weekday()
     day_dic = {
         0: "Monday",
@@ -111,6 +93,16 @@ def cal_day():
     return day_dic[day]
 
 def play_song(song_name=None, song_uri=None):
+    """
+    Play a song on Spotify using either the song name or URI.
+
+    Args:
+        song_name (str, optional): The name of the song to play.
+        song_uri (str, optional): The Spotify URI of the song to play.
+
+    Returns:
+        str: A message indicating the song being played or an error message.
+    """
     if song_uri is None and song_name is None:
         # If no song URI or name is provided, play a default song or user's last played song
         song_uri = 'spotify:track:57vxBYXtHMk6H1aD29V7PU'  # Default song URI
@@ -138,6 +130,9 @@ def play_song(song_name=None, song_uri=None):
         return error_message
 
 def wishMe():
+    """
+    Generate and speak a greeting based on the current time of day.
+    """
     hour = datetime.datetime.now().hour
     t = time.strftime("%I:%M %p")
     day = cal_day()
@@ -152,6 +147,12 @@ def wishMe():
     speak(f"{greeting} Boss, It's {day} and the time is {t}")
 
 def social_media(command):
+    """
+    Open a social media website based on the given command.
+
+    Args:
+        command (str): The voice command containing the social media platform name.
+    """
     sites = {
         'facebook': "https://facebook.com/",
         'discord': "https://discord.com/channels/@me/",
@@ -170,6 +171,15 @@ def social_media(command):
 
 
 def open_application(app_name):
+    """
+    Open an application on the user's system.
+
+    Args:
+        app_name (str): The name of the application to open.
+
+    Returns:
+        str: A message indicating the result of the operation.
+    """
     system = platform.system()
     try:
         if system == 'Windows':
@@ -183,6 +193,15 @@ def open_application(app_name):
         return f"Failed to open {app_name}: {str(e)}"
 
 def close_application(app_name):
+    """
+    Close an application on the user's system.
+
+    Args:
+        app_name (str): The name of the application to close.
+
+    Returns:
+        str: A message indicating the result of the operation.
+    """
     system = platform.system()
     try:
         if system == 'Windows':
@@ -194,9 +213,17 @@ def close_application(app_name):
         return f"Failed to close {app_name}: {str(e)}"
 
 def send_whatsapp_message(recipient, message):
+    """
+    Send a WhatsApp message to a specified recipient.
+
+    Args:
+        recipient (str): The name or identifier of the message recipient.
+        message (str): The content of the message to send.
+
+    Returns:
+        str: A message indicating the result of the operation.
+    """    
     contacts = {
-        "bert": "+27832178843",
-        "bubbles": "+27720656667",
         # Add more contacts as needed
     }
 
@@ -217,12 +244,23 @@ def send_whatsapp_message(recipient, message):
 
 assistant = client.beta.assistants.create(
     name="Personal Assistant",
-    instructions="You are a helpful assistant named Wednesday that performs various tasks based on user commands. Your personality is based on Wednesday Addams. Engage in conversation and use functions when necessary. Any query regarding email reading and scheduling should be kept short and sweet ",
+    instructions="You are a helpful assistant named Wednesday that performs various tasks based on user commands. Your personality is based on Wednesday Addams but very sarctastic. Engage in conversation and use functions when necessary. Any query regarding email reading and scheduling should be kept short and sweet. Make schedule details very short",
     tools=tools,
     model="gpt-4-1106-preview",
 )
 
 def get_openai_response(thread_id, user_input, use_speech=True):
+    """
+    Get a response from the OpenAI assistant based on user input.
+
+    Args:
+        thread_id (str): The ID of the conversation thread.
+        user_input (str): The user's input or question.
+        use_speech (bool, optional): Whether to speak the response. Defaults to True.
+
+    Returns:
+        str: The assistant's response.
+    """
     try:
         # Check for any active runs
         runs = client.beta.threads.runs.list(thread_id=thread_id)

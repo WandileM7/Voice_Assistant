@@ -6,10 +6,25 @@ from googleapiclient.errors import HttpError
 from events import *
 
 def get_gmail_service():
+    """
+    Authenticate and build the Gmail service.
+
+    Returns:
+        googleapiclient.discovery.Resource: The authenticated Gmail service.
+    """
     creds = authenticate_google()
     return build('gmail', 'v1', credentials=creds)
 
 def read_emails(num_emails=5):
+    """
+    Read the specified number of recent emails from the user's Gmail inbox.
+
+    Args:
+        num_emails (int, optional): The number of emails to read. Defaults to 5.
+
+    Returns:
+        str: A summary of the read emails or an error message.
+    """
     try:
         service = get_gmail_service()
         results = service.users().messages().list(userId='me', labelIds=['INBOX'], maxResults=num_emails).execute()
@@ -39,6 +54,17 @@ def read_emails(num_emails=5):
         return f'An error occurred: {error}'
 
 def send_email(to, subject, body):
+    """
+    Send an email using the authenticated Gmail service.
+
+    Args:
+        to (str): The recipient's email address.
+        subject (str): The subject of the email.
+        body (str): The body content of the email.
+
+    Returns:
+        str: A message indicating the result of the operation or an error message.
+    """
     try:
         service = get_gmail_service()
         message = MIMEText(body)

@@ -15,6 +15,12 @@ SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.co
 SA_TIMEZONE = 'Africa/Johannesburg'
 
 def authenticate_google():
+    """
+    Authenticate the user with Google services using OAuth 2.0.
+
+    Returns:
+        google.oauth2.credentials.Credentials: The authenticated credentials.
+    """
     creds = None
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
@@ -29,6 +35,12 @@ def authenticate_google():
     return creds
 
 def get_events():
+    """
+    Retrieve and summarize events for the current day from all Google Calendars.
+
+    Returns:
+        str: A summary of the day's events or a message if no events are found.
+    """
     creds = authenticate_google()
     service = build('calendar', 'v3', credentials=creds)
 
@@ -67,14 +79,40 @@ def get_events():
         return "\n".join(event_summaries)
 
 def schedule():
+    """
+    Wrapper function to get and return the day's events.
+
+    Returns:
+        str: A summary of the day's events or a message if no events are found.
+    """
     return get_events()
 
 def get_calendar_service():
+    """
+    Authenticate and build the Google Calendar service.
+
+    Returns:
+        googleapiclient.discovery.Resource: The authenticated Calendar service.
+    """
     creds = authenticate_google()
     service = build('calendar', 'v3', credentials=creds)
     return service
 
 def create_event(summary, location, description, start_time, end_time, attendees=None):
+    """
+    Create a new event in the user's primary Google Calendar.
+
+    Args:
+        summary (str): The title of the event.
+        location (str): The location of the event.
+        description (str): A description of the event.
+        start_time (str): The start time of the event (in ISO format).
+        end_time (str): The end time of the event (in ISO format).
+        attendees (list, optional): A list of attendee email addresses.
+
+    Returns:
+        str: A message with the created event's link or an error message.
+    """
     try:
         service = get_calendar_service()
         

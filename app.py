@@ -19,12 +19,17 @@ thread = client.beta.threads.create()
 account_sid = os.getenv('TWILIO_ACCOUNT_SID')
 auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 twilio_client = Client(account_sid, auth_token)
-twilio_phone_number = 'whatsapp:+19387772439'  # Replace with your Twilio WhatsApp number
 
 app = Flask(__name__)
 
 @app.route('/bot', methods=['POST'])
 def bot():
+    """
+    Handle incoming WhatsApp messages and respond using the OpenAI assistant.
+
+    Returns:
+        str: The Twilio MessagingResponse as a string.
+    """
     incoming_msg = request.values.get('Body', '').lower()
     from_number = request.values.get('From', '')
 
@@ -42,4 +47,4 @@ def bot():
     return str(resp)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=6000)
